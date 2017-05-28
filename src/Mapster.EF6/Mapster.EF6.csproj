@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/chaowlert/Mapster.EF6</PackageProjectUrl>
     <RepositoryUrl>https://github.com/chaowlert/Mapster.EF6</RepositoryUrl>
     <PackageTags>Mapster;EF6</PackageTags>
-    <PackageIconUrl>http://www.fancyicons.com/free-icons/103/pretty-office-5/png/128/order_128.png</PackageIconUrl>
+    <PackageIconUrl>https://cloud.githubusercontent.com/assets/5763993/26522718/d16f3e42-4330-11e7-9b78-f8c7402624e7.png</PackageIconUrl>
     <SignAssembly>True</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <AssemblyOriginatorKeyFile>Mapster.EF6.snk</AssemblyOriginatorKeyFile>

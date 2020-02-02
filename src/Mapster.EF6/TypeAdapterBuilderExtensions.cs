@@ -12,7 +12,7 @@ namespace Mapster
 {
     public static class TypeAdapterBuilderExtensions
     {
-        public static TypeAdapterBuilder<TSource> CreateEntityFromContext<TSource>(this TypeAdapterBuilder<TSource> builder, IObjectContextAdapter context)
+        public static TypeAdapterBuilder<TSource> EntityFromContext<TSource>(this TypeAdapterBuilder<TSource> builder, IObjectContextAdapter context)
         {
             const string DB_KEY = "Mapster.EF6.db";
             return builder
@@ -32,6 +32,9 @@ namespace Mapster
                             //var set = db.Set<T>();
                             //return set.Find(src.id) ?? new T();
                             var src = Expression.Parameter(arg.SourceType);
+                            var dest = arg.MapType == MapType.MapToTarget
+                                ? Expression.Parameter(arg.DestinationType)
+                                : null;
                             var db = Expression.Variable(typeof(DbContext), "db");
                             var set = Expression.Variable(typeof(DbSet<>).MakeGenericType(arg.DestinationType), "set");
 
@@ -64,12 +67,16 @@ namespace Mapster
                                 .ToArray();
                             if (getters.Length != keys.Length)
                                 throw new InvalidOperationException($"Cannot get key for sourceType={arg.SourceType.Name}, destinationType={arg.DestinationType.Name}");
+                            Expression find = Expression.Call(set, nameof(DbSet.Find), null,
+                                Expression.NewArrayInit(typeof(object), getters));
+                            if (arg.MapType == MapType.MapToTarget)
+                                find = Expression.Coalesce(find, dest);
                             var ret = Expression.Coalesce(
-                                Expression.Call(set, nameof(DbSet.Find), null, Expression.NewArrayInit(typeof(object), getters)),
+                                find,
                                 Expression.New(arg.DestinationType));
                             return Expression.Lambda(
                                 Expression.Block(new[] { db, set }, dbAssign, setAssign, ret),
-                                src);
+                                arg.MapType == MapType.MapToTarget ? new[] { src, dest } : new[] { src });
                         };
                     }
                 }, context.GetType().FullName);
